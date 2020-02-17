@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Ranthonym/tinyapp/issues"
   },
-  "homepage": "https://github.com/Ranthonym/tinyapp#readme"
+  "homepage": "https://github.com/Ranthonym/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
