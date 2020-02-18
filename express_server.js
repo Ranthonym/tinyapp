@@ -1,15 +1,17 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080;
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
-  "x98thb": "htt"
+  "x98thb": "http://www.tsn.ca"
 };
 
 //random 6 string generator
@@ -32,16 +34,17 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase, username: req.cookies.username };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {username: req.cookies.username};
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies.username };
   res.render("urls_show", templateVars);
 });
 
@@ -70,7 +73,18 @@ app.post("/urls/:shortURL", (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.longURL;
   res.redirect('/urls');
  });
- 
 
+  //edits new username to cookie
+ app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
+ });
+
+ //logs out user
+ app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect('/urls');
+ });
+ 
 
 
