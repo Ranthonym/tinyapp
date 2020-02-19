@@ -39,23 +39,6 @@ const generateRandomString = () => Math.random().toString(36).substring(7);
   return false;
 };
 
-// validate user helper function
-// const validateUser = (email, password) => {
-//   // loops over everything in users and returns the first case where the conditions match
-//   for (user in users) {
-//     console.log(user.email);
-//     console.log(user.password);
-//     return (user.email === email && user.password === password);
-//   }
-//   return;
-// };
-
-// console.log(validateUser("user@example.com", "123"));
-// console.log(validateUser("user2@example.com", "abc"));
-// console.log(validateUser("user@example.com", "htl"));
-// console.log(validateUser("user37@example.com", "opp"));
-
-
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -120,10 +103,9 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect('/urls');
  });
 
-
 // read body's email and password, find the user that matches those and extract the userID. assign that userID to cookie
 
-// Login function>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// Login function
  app.post("/login", (req, res) => {
   // check if email exists
   let user = (emailSearch(req.body.email)) 
@@ -135,7 +117,6 @@ app.post("/urls/:shortURL", (req, res) => {
     res.cookie("user_id", user.id);
     res.redirect('/urls');
   } else {
-    console.log("validation error");
     res.sendStatus(403);
   }
 });
@@ -173,7 +154,6 @@ app.post("/register", (req, res) => {
   }
   res.cookie("user_id", userID);
   res.redirect('/urls');
-  
   }
  });
 
