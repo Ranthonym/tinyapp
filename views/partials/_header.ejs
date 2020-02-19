@@ -16,6 +16,9 @@
       <form class="form-inline" action="/logout %>" method="POST">
         <button type="submit" class="btn btn-primary">Logout</button>
       </form>
-   <% } %>
+   <% } else { %>
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
+    <% } %>
   </nav>
 </header>

@@ -23,7 +23,7 @@ const users = {
  "user2RandomID": {
     id: "user2RandomID", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    password: "abc"
   }
 }
 
@@ -34,19 +34,27 @@ const generateRandomString = () => Math.random().toString(36).substring(7);
  const emailSearch = (email) => {
   for (let keyID in users) {
     if (users[keyID].email === email)
-    return true;
+    return users[keyID];
   }
-  return;
+  return false;
 };
 
 // validate user helper function
-const validateUser = (username, password) => {
-  // loops over everything in users and returns the first case where the conditions match
-  user => user.username === username && user.password === password;
-  for (user in users) {
-    return (user.username === username && user.password === password);
-  }
-};
+// const validateUser = (email, password) => {
+//   // loops over everything in users and returns the first case where the conditions match
+//   for (user in users) {
+//     console.log(user.email);
+//     console.log(user.password);
+//     return (user.email === email && user.password === password);
+//   }
+//   return;
+// };
+
+// console.log(validateUser("user@example.com", "123"));
+// console.log(validateUser("user2@example.com", "abc"));
+// console.log(validateUser("user@example.com", "htl"));
+// console.log(validateUser("user37@example.com", "opp"));
+
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -77,7 +85,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = {username: req.cookies.username};
+  let templateVars = {user:  users[req.cookies.user_id]};
   res.render("urls_new", templateVars);
 });
 
@@ -112,24 +120,23 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect('/urls');
  });
 
-//   //edits new username to cookie
-//  app.post("/login", (req, res) => {
-//    console.log(req.body)
-
-
-//   res.cookie('user_id', req.body.user_id);
-//   res.redirect('/urls');
-//  });
 
 // read body's email and password, find the user that matches those and extract the userID. assign that userID to cookie
 
 // Login function>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
  app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  if (validateUser(username, password)) {
+  // check if email exists
+  let user = (emailSearch(req.body.email)) 
+    if (user === false) {
+    res.sendStatus(403);
+    } 
+    // check if password matches
+    if (req.body.password === user.password) {
     res.cookie("user_id", user.id);
+    res.redirect('/urls');
   } else {
-    res.redirect("/login");
+    console.log("validation error");
+    res.sendStatus(403);
   }
 });
 
