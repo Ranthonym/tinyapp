@@ -13,6 +13,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
   "x98thb": "http://www.tsn.ca"
 };
+// global object
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
 
 //random 6 string generator
 const generateRandomString = () => Math.random().toString(36).substring(7);
@@ -85,6 +98,36 @@ app.post("/urls/:shortURL", (req, res) => {
   res.clearCookie("username");
   res.redirect('/urls');
  });
- 
+
+// show registration page
+app.get("/register", (req, res) => {
+  let templateVars = {email: req.body.email, password: req.body.password, username: req.cookies.username };
+  res.render("register", templateVars);
+});
+
+// registration event handler
+app.post("/register", (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    res.statusCode = 400;
+  }
+  if (emailSearch(req.body.email)) {
+    res.statusCode =  400;
+  }
+  const userID = generateRandomString();
+  users["id"] = userID;
+  users["email"] = req.body.email;
+  users["password"] = req.body.password;
+  res.cookie("user_id", userID);
+  res.redirect('/urls');
+ });
+
+ // email search helper function
+ const emailSearch = (email) => {
+   for (let keyID in users) {
+     if (users[keyID].email === email)
+     return true;
+   }
+   return;
+ };
 
 
