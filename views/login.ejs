@@ -9,36 +9,18 @@
   <title>TinyApp</title>
 </head>
 <body>
-  <%- include('./partials/_header', {user}) %>
+  <%- include('./partials/_header') %>
   <main style="margin: 1em;">
-    <h3>My URLs</h3>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Short URL</th>
-          <th scope="col">Long URL</th>
-          <th> Edit </th>
-          <th> Delete </th> 
-        </tr>
-      </thead>
-      <tbody>
-        <% for(let url in urls) { %>
-          <tr>
-            <td><%= url %></td>
-            <td><%= urls[url] %></td>
-            <td> <a href="/urls/<%= url %>">
-              <button type="submit" style="border-color:blue; background-color: blue; color:white;" >Edit</button>
-            </a>
-           </td>
-            <td>
-              <form method="POST" action="/urls/<%= url %>/delete">
-                <button type="submit" style="border-color:red; background-color: red; color: white;" >Delete</button>
-              </form>
-            </td>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
+    <div>
+    <h3>Login Page</h3>
+  </div>
+    <div>
+      <form action="/login" method="POST">
+        <input type="email" name="email" placeholder="Enter Email">
+        <input type="password" name="password" placeholder="Enter Password">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
   </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

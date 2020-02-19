@@ -18,7 +18,7 @@ const users = {
   "userRandomID": {
     id: "userRandomID", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: "123"
   },
  "user2RandomID": {
     id: "user2RandomID", 
@@ -29,6 +29,24 @@ const users = {
 
 //random 6 string generator
 const generateRandomString = () => Math.random().toString(36).substring(7);
+
+ // email search helper function
+ const emailSearch = (email) => {
+  for (let keyID in users) {
+    if (users[keyID].email === email)
+    return true;
+  }
+  return;
+};
+
+// validate user helper function
+const validateUser = (username, password) => {
+  // loops over everything in users and returns the first case where the conditions match
+  user => user.username === username && user.password === password;
+  for (user in users) {
+    return (user.username === username && user.password === password);
+  }
+};
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -46,8 +64,15 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+ //rendering new login template
+ app.get("/login", (req, res) => {
+  let templateVars = {email: req.body.email, password: req.body.password, user:  users[req.cookies.user_id] };
+  res.render("login", templateVars);
+});
+
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase, username: req.cookies.username };
+ // console.log("user info -->", users);
+  let templateVars = { urls: urlDatabase, user:  users[req.cookies.user_id] };
   res.render("urls_index", templateVars);
 });
 
@@ -57,7 +82,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies.username };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user:  users[req.cookies.user_id] };
   res.render("urls_show", templateVars);
 });
 
@@ -87,47 +112,65 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect('/urls');
  });
 
-  //edits new username to cookie
+//   //edits new username to cookie
+//  app.post("/login", (req, res) => {
+//    console.log(req.body)
+
+
+//   res.cookie('user_id', req.body.user_id);
+//   res.redirect('/urls');
+//  });
+
+// read body's email and password, find the user that matches those and extract the userID. assign that userID to cookie
+
+// Login function>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
  app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
- });
+  const { username, password } = req.body;
+  if (validateUser(username, password)) {
+    res.cookie("user_id", user.id);
+  } else {
+    res.redirect("/login");
+  }
+});
+
 
  //logs out user
  app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect('/urls');
  });
 
 // show registration page
 app.get("/register", (req, res) => {
-  let templateVars = {email: req.body.email, password: req.body.password, username: req.cookies.username };
+  //console.log("user info -->", users[req.cookies.user_id]);
+  let templateVars = {email: req.body.email, password: req.body.password, user:  users[req.cookies.user_id] };
   res.render("register", templateVars);
 });
 
 // registration event handler
 app.post("/register", (req, res) => {
-  if (!req.body.email || !req.body.password) {
-    res.statusCode = 400;
+  // check if text fields are empty
+  if (req.body.email === '' || req.body.password === '') {
+    res.sendStatus(400);
   }
+  // check if email already exists
   if (emailSearch(req.body.email)) {
-    res.statusCode =  400;
-  }
+    res.sendStatus(400);
+  } else {
+  // generate new user info child object
   const userID = generateRandomString();
-  users["id"] = userID;
-  users["email"] = req.body.email;
-  users["password"] = req.body.password;
+  users[userID] = {
+    id: userID,
+    email: req.body.email,
+    password: req.body.password
+  }
   res.cookie("user_id", userID);
   res.redirect('/urls');
+  
+  }
  });
 
- // email search helper function
- const emailSearch = (email) => {
-   for (let keyID in users) {
-     if (users[keyID].email === email)
-     return true;
-   }
-   return;
- };
+
+
 
 
