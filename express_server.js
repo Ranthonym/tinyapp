@@ -33,9 +33,9 @@ const users = {
 const generateRandomString = () => Math.random().toString(36).substring(7);
 
 // email search helper function
-const emailSearch = email => {
-  for (let keyID in users) {
-    if (users[keyID].email === email) return users[keyID];
+const getUserByEmail = (email, database) => {
+  for (let keyID in database) {
+    if (database[keyID].email === email) return database[keyID];
   }
   return false;
 };
@@ -154,7 +154,7 @@ app.post("/urls/:shortURL", (req, res) => {
 // Login function
 app.post("/login", (req, res) => {
   // check if email exists
-  let user = emailSearch(req.body.email);
+  let user = getUserByEmail(req.body.email, users);
   if (user === false) {
     res.sendStatus(403);
   }
@@ -190,7 +190,7 @@ app.post("/register", (req, res) => {
     res.sendStatus(400);
   }
   // check if email already exists
-  if (emailSearch(req.body.email)) {
+  if (getUserByEmail(req.body.email, users)) {
     res.sendStatus(400);
   } else {
     // generate new user info child object
