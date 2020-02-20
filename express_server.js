@@ -29,10 +29,7 @@ const users = {
 };
 
 //random 6 string generator
-const generateRandomString = () =>
-  Math.random()
-    .toString(36)
-    .substring(7);
+const generateRandomString = () => Math.random().toString(36).substring(7);
 
 // email search helper function
 const emailSearch = email => {
@@ -82,7 +79,6 @@ app.get("/login", (req, res) => {
 app.get("/urls", (req, res) => {
   //generate new filtered object holding all short URLS matched to the logged in user_id
   let objURL = {}
-  console.log(req.cookies.user_id);
   let urlArr = urlsForUser(req.cookies.user_id);
 
   for (let shortURL in urlDatabase) {
@@ -123,20 +119,24 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Update express server so that the shortURL-longURL key-value pair are saved to urlDatabase when it receives a POST request to /urls
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {
     longURL: longURL,
     userID: req.cookies.user_id
   };
-  console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 });
+
 //deletes url
 app.post("/urls/:shortURL/delete", (req, res) => {
+  // check if url's user ID matches cookie's user ID. then delete if yes
+  if (urlDatabase[req.params.shortURL].userID === (req.cookies.user_id)) {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 //edits and updates new long url
