@@ -40,7 +40,6 @@ const emailSearch = email => {
 };
 //  function that returns the URLs where the userID is equal to the id of the currently logged in user.
 const urlsForUser = (id) => {
-  console.log("cookie name is: ", id);
   let urlArr = [];
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
@@ -117,7 +116,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-// Update express server so that the shortURL-longURL key-value pair are saved to urlDatabase when it receives a POST request to /urls
+// Update express server with new shortURL object entry
 app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
@@ -141,8 +140,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //edits and updates new long url
 app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.longURL;
+  if (urlDatabase[req.params.shortURL].userID === (req.cookies.user_id)) {
+  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
+  } else {
+     res.sendStatus(403);
+  }
 });
 
 // read body's email and password, find the user that matches those and extract the userID. assign that userID to cookie
@@ -171,7 +174,6 @@ app.post("/logout", (req, res) => {
 
 // show registration page
 app.get("/register", (req, res) => {
-  //console.log("user info -->", users[req.cookies.user_id]);
   let templateVars = {
     email: req.body.email,
     password: req.body.password,
