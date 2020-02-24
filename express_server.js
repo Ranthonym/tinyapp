@@ -52,12 +52,9 @@ app.get("/urls", (req, res) => {
   //generate new filtered object holding all short URLS matched to the logged in user_id
   let objURL = {};
   let urlArr = urlsForUser(req.session.user_id, urlDatabase);
-
   for (let shortURL in urlDatabase) {
-    for (let j = 0; j <  urlArr.length; j++) {
-      if (shortURL === urlArr[j]) {
+    if (urlArr.includes(shortURL)) {
         objURL[shortURL] = urlDatabase[shortURL];
-      }
     }
   }
   // pass new filtered object to template file for rendering unique table
@@ -68,6 +65,7 @@ app.get("/urls", (req, res) => {
     res.sendStatus(403);
   }
 });
+
 
 // renders new url link creation page
 app.get("/urls/new", (req, res) => {
@@ -81,23 +79,23 @@ app.get("/urls/new", (req, res) => {
 
 // renders the url specific page based on shortURL with link to longURL
 app.get("/urls/:shortURL", (req, res) => {
-  if (urlDatabase[req.params.shortURL]) {
-    if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
+  if (!urlDatabase[req.params.shortURL]) {
+    res.sendStatus(404);
+  } else if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
       let templateVars = {
         shortURL: req.params.shortURL,
         longURL: urlDatabase[req.params.shortURL].longURL,
         user: users[req.session.user_id]
       };
-      res.render("urls_show", templateVars);
-    } else res.sendStatus(403);
-  } else res.sendStatus(404);
+    res.render("urls_show", templateVars);
+  } else res.sendStatus(403);
 });
 
 //If user is logged in, redirect to desired website based on shortURL id
 app.get("/u/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     let longURL = urlDatabase[req.params.shortURL].longURL;
-    res.redirect(`http://${longURL}`);
+    res.redirect(`${longURL}`);
   } else {
     res.sendStatus(404);
   }
